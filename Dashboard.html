@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker Dashboard</title>
+    
+    <style>
+        /* Reset and basic styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f0f8ff;
+            color: #333;
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            color: white;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar a {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-size: 18px;
+            padding: 10px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #34495e;
+        }
+
+        /* Sidebar sections */
+        .sidebar-section {
+            margin-top: 20px;
+        }
+
+        .sidebar-section h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        /* Container styles */
+        .container {
+            width: calc(100% - 250px);
+            max-width: 900px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-left: 250px;
+            overflow-y: auto;
+            position: relative;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Title */
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        /* Add Expense Form */
+        .expense-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .expense-form input[type="text"],
+        .expense-form input[type="date"],
+        .expense-form input[type="number"] {
+            width: calc(33% - 10px);
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .expense-form button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .expense-form button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Expense List */
+        .expense-list {
+            list-style-type: none;
+            margin-top: 20px;
+        }
+
+        .expense-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #f7f9fc;
+            border: 1px solid #e1e8ed;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            transition: background 0.3s;
+        }
+
+        .expense-item:hover {
+            background-color: #eaf2f8;
+        }
+
+        .expense-details {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .expense-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            color: #3498db;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .expense-actions button:hover {
+            color: #2980b9;
+        }
+
+        /* Total Expenses */
+        .total-expenses {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Dashboard</h2>
+        <a href="expense.html">Expense Tracker</a>
+        <div class="sidebar-section">
+            <h3>Graphs</h3>
+            <a href="graph.html">View Expense Graph</a>
+        </div>
+        <div class="sidebar-section">
+            <h3>Notes</h3>
+            <a href="notes2.html">Add/View Notes</a>
+        </div>
+        <div class="sidebar-section">
+            <h3>Diary</h3>
+            <a href="Diary.html">Expense Diary</a>
+        </div>
+        
+        <div class="sidebar-section">
+            <h3>Reminder</h3>
+            <a href="reminder.html">Remind me</a>
+        </div>
+        <button onclick="logout()">Logout</button>
+
+    </div>
+
+    <!-- Main container -->
+    <div class="container">
+        <h1>Expense Tracker Dashboard</h1>
+        
+        <!-- Add Expense Form -->
+        <form class="expense-form" id="expense-form">
+            <input type="number" id="amount" placeholder="Amount (₹)" required>
+            <input type="text" id="category" placeholder="Category" required>
+            <input type="date" id="date" required>
+            <input type="text" id="description" placeholder="Description (optional)">
+            <button type="button" onclick="addExpense()">Add Expense</button>
+        </form>
+
+        <!-- Expense List -->
+        <ul class="expense-list" id="expense-list">
+            <!-- Dynamic content will be added here -->
+        </ul>
+
+        <!-- Total Expenses -->
+        <div class="total-expenses" id="total-expenses">Total Expenses: ₹0</div>
+    </div>
+
+    <script>
+        
+    const expenseList = document.getElementById('expense-list');
+    const totalExpenses = document.getElementById('total-expenses');
+    let expenses = JSON.parse(localStorage.getItem('expenses')) || []; // Load existing expenses from LocalStorage
+    
+    // Function to add a new expense
+    function addExpense() {
+        const amount = document.getElementById('amount').value;
+        const category = document.getElementById('category').value;
+        const date = document.getElementById('date').value;
+        const description = document.getElementById('description').value;
+
+        if (amount && category && date) {
+            const expense = {
+                id: Date.now(), // Unique ID for each expense
+                amount: parseFloat(amount),
+                category,
+                date,
+                description
+            };
+
+            expenses.push(expense);
+            localStorage.setItem('expenses', JSON.stringify(expenses)); // Save expenses to LocalStorage
+            renderExpenses();
+            calculateTotal();
+
+            // Reset form fields
+            document.getElementById('expense-form').reset();
+        }
+    }
+
+    // Function to delete an expense
+    function deleteExpense(index) {
+        expenses.splice(index, 1);
+        localStorage.setItem('expenses', JSON.stringify(expenses)); // Update LocalStorage
+        renderExpenses();
+        calculateTotal();
+    }
+
+    // Function to edit an expense
+    function editExpense(index) {
+        const expense = expenses[index];
+        document.getElementById('amount').value = expense.amount;
+        document.getElementById('category').value = expense.category;
+        document.getElementById('date').value = expense.date;
+        document.getElementById('description').value = expense.description;
+
+        deleteExpense(index); // Remove the expense being edited
+    }
+    
+
+    // Function to render the list of expenses
+    function renderExpenses() {
+        expenseList.innerHTML = '';
+        expenses.forEach((expense, index) => {
+            const expenseItem = document.createElement('li');
+            expenseItem.classList.add('expense-item');
+            expenseItem.innerHTML = `
+                <div class="expense-details">
+                    <span>${expense.category}: ₹${expense.amount} on ${expense.date}</span>
+                    ${expense.description ? `<span>(${expense.description})</span>` : ''}
+                </div>
+                <div class="expense-actions">
+                    <button onclick="editExpense(${index})">Edit</button>
+                    <button onclick="deleteExpense(${index})">Delete</button>
+                </div>
+            `;
+            expenseList.appendChild(expenseItem);
+        });
+    }
+
+    // Function to calculate the total expenses
+    function calculateTotal() {
+        const total = expenses.reduce((acc, expense) => acc + expense.amount, 0);
+        totalExpenses.textContent = `Total Expenses: ₹${total}`;
+    }
+    function logout() {
+    localStorage.removeItem('loggedInUser');
+    window.location.href = "login.html";
+    }
+
+
+
+    // Load expenses when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        renderExpenses();
+        calculateTotal();
+    });
+    
+    
+    
+</script>
+
+</body>
+</html>

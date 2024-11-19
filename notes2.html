@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes with Folder</title>
+    <style>
+        /* Main Body Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 25%, #e0f7fa 25%, #e0f7fa 50%, #f0f4f8 50%, #f0f4f8 75%, #e0f7fa 75%);
+            background-size: 20px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            color: #333;
+        }
+        /* Main Notes Container */
+        .notes-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            animation: fadeIn 1s ease-in-out;
+        }
+        /* Fade-in Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Title */
+        .notes-container h2 {
+            text-align: center;
+            margin: 0 0 20px;
+        }
+        /* Text Area Styling */
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            resize: none;
+            margin-bottom: 10px;
+        }
+        /* Button Styling */
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        .save-btn { background-color: #0072ff; color: #fff; }
+        .view-btn { background-color: #00bfa5; color: #fff; }
+
+        /* Full-Screen Modal for Saved Notes */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            animation: fadeInModal 0.5s ease;
+        }
+        @keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        /* Modal Content */
+        .modal-content {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80%;
+            overflow-y: auto;
+            text-align: left;
+            position: relative;
+        }
+        /* Close Button for Modal */
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff1744;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            font-size: 0.9em;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        /* Saved Note Item */
+        .saved-note {
+            background-color: #e3f2fd;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .saved-note:hover {
+            background-color: #bbdefb;
+        }
+        .delete-note {
+            background-color: #ff1744;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Notes Container -->
+    <div class="notes-container">
+        <h2>My Notes</h2>
+        <textarea id="noteInput" placeholder="Write your note here..."></textarea>
+        <div class="buttons">
+            <button class="save-btn" onclick="saveNote()">Save</button>
+            <button class="view-btn" onclick="openModal()">View Saved Notes</button>
+        </div>
+    </div>
+
+    <!-- Full-Screen Modal for Saved Notes -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">Close</button>
+            <h3>Saved Notes</h3>
+            <div id="savedNotesContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize notes array from localStorage
+        let notesArray = JSON.parse(localStorage.getItem('savedNotes')) || [];
+
+        // Save note function
+        function saveNote() {
+            const noteText = document.getElementById('noteInput').value.trim();
+            if (noteText) {
+                notesArray.push({
+                    text: noteText,
+                    date: new Date().toLocaleString()
+                });
+                // Save to localStorage
+                localStorage.setItem('savedNotes', JSON.stringify(notesArray));
+                document.getElementById('noteInput').value = ''; // Clear the textarea
+                alert('Note saved successfully!');
+            } else {
+                alert('Please write something before saving.');
+            }
+        }
+
+        // Delete note function
+        function deleteNote(index) {
+            if (confirm('Are you sure you want to delete this note?')) {
+                notesArray.splice(index, 1);
+                // Update localStorage
+                localStorage.setItem('savedNotes', JSON.stringify(notesArray));
+                displaySavedNotes();
+            }
+        }
+
+        // Open modal to view saved notes
+        function openModal() {
+            document.getElementById('modal').style.display = 'flex';
+            displaySavedNotes();
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // Display saved notes in the modal
+        function displaySavedNotes() {
+            const savedNotesContainer = document.getElementById('savedNotesContainer');
+            savedNotesContainer.innerHTML = ''; // Clear existing notes
+            if (notesArray.length === 0) {
+                savedNotesContainer.innerHTML = '<p>No saved notes available.</p>';
+            } else {
+                notesArray.forEach((note, index) => {
+                    const noteDiv = document.createElement('div');
+                    noteDiv.className = 'saved-note';
+                    noteDiv.innerHTML = `
+                        <div>
+                            <strong>Note ${index + 1}</strong> (${note.date})<br>
+                            ${note.text}
+                        </div>
+                        <button class="delete-note" onclick="deleteNote(${index})">Delete</button>
+                    `;
+                    savedNotesContainer.appendChild(noteDiv);
+                });
+            }
+        }
+    </script>
+
+</body>
+</html>

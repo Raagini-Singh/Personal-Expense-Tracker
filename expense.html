@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Expense Tracker</title>
+    <style>
+        /* General styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff; /* Light blue background */
+            color: #333;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Container for the About Us section */
+        .about-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            text-align: center;
+            animation: fadeIn 1s ease-out; /* Animation effect */
+        }
+
+        /* Styling for heading */
+        .about-container h2 {
+            color: #0072ff; /* Accent color */
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        /* Styling for paragraph */
+        .about-container p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        /* Button styling */
+        .about-container button {
+            background-color: #0072ff;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1em;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Hover effect for button */
+        .about-container button:hover {
+            background-color: #005bb5;
+        }
+
+        /* Fade-in animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- About Us section container -->
+    <div class="about-container">
+        <h2>About Us</h2>
+        <p>
+            Welcome to our Expense Tracker! We're here to make managing your finances easier,
+            whether you're tracking daily expenses, planning for monthly bills, or setting reminders for
+            upcoming payments. Our goal is to help you stay organized and in control of your money.
+            We’re thrilled to have you here and hope this tool brings simplicity and clarity to your financial journey. Happy tracking!
+        </p>
+        <button onclick="window.location.href='Dashboard.html'">Get Started</button> <!-- Button to navigate back to tracker -->
+    </div>
+</body>
+</html>

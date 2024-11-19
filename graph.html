@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Expense Graph</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-top: 10px;
+        }
+        .chart-container {
+            width: 80%;
+            max-width: 600px;
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Monthly Expense Summary</h1>
+    <div class="chart-container">
+        <canvas id="monthlyExpenseChart"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+
+        function getMonthlyData() {
+            const monthlyData = {};
+            expenses.forEach(expense => {
+                const month = expense.date.slice(0, 7); // Extract "YYYY-MM" from date
+                monthlyData[month] = (monthlyData[month] || 0) + parseFloat(expense.amount);
+            });
+            return monthlyData;
+        }
+
+        function renderChart() {
+            const monthlyData = getMonthlyData();
+            const ctx = document.getElementById('monthlyExpenseChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(monthlyData),
+                    datasets: [{
+                        label: 'Expenses per Month (₹)',
+                        data: Object.values(monthlyData),
+                        backgroundColor: '#0072ff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderChart);
+    </script>
+
+</body>
+</html>

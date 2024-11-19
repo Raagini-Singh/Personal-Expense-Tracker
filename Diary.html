@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Diary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #0072ff;
+        }
+
+        .diary-section {
+            margin-top: 20px;
+        }
+
+        .day-expenses {
+            margin-bottom: 20px;
+        }
+
+        .expense-entry {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid #0072ff;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            cursor: pointer;
+            font-size: 14px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: none;
+            transition: background-color 0.3s;
+        }
+
+        .edit-btn {
+            background-color: #ff9800;
+            color: #fff;
+        }
+
+        .delete-btn {
+            background-color: #e53935;
+            color: #fff;
+        }
+
+        .edit-btn:hover {
+            background-color: #e68a00;
+        }
+
+        .delete-btn:hover {
+            background-color: #c62828;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Expense Diary</h1>
+    <div id="diarySection" class="diary-section"></div>
+</div>
+
+<script>
+    // Fetch expenses from LocalStorage
+    const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+
+    function showDiary() {
+        const diarySection = document.getElementById('diarySection');
+        diarySection.innerHTML = ''; // Clear existing content
+
+        // Group expenses by date
+        const groupedExpenses = expenses.reduce((acc, expense) => {
+            const date = new Date(expense.date).toLocaleDateString();
+            if (!acc[date]) acc[date] = [];
+            acc[date].push(expense);
+            return acc;
+        }, {});
+
+        // Display expenses grouped by date
+        Object.keys(groupedExpenses).forEach(date => {
+            const dayDiv = document.createElement('div');
+            dayDiv.classList.add('day-expenses');
+            dayDiv.innerHTML = `<h3>${date}</h3>`;
+            diarySection.appendChild(dayDiv);
+
+            groupedExpenses[date].forEach(expense => {
+                const expenseEntry = document.createElement('div');
+                expenseEntry.classList.add('expense-entry');
+                expenseEntry.innerHTML = `
+                    <div>
+                        <strong>${expense.name}</strong> - ₹${expense.amount}<br>
+                        <span>${expense.category}</span>
+                    </div>
+                    <div class="actions">
+                        <button class="action-btn edit-btn" onclick="editExpense(${expense.id})">Edit</button>
+                        <button class="action-btn delete-btn" onclick="deleteExpense(${expense.id})">Delete</button>
+                    </div>
+                `;
+                dayDiv.appendChild(expenseEntry);
+            });
+        });
+    }
+
+    function editExpense(id) {
+        const expense = expenses.find(exp => exp.id === id);
+        if (expense) {
+            const newName = prompt("Edit name:", expense.name);
+            const newAmount = prompt("Edit amount:", expense.amount);
+            const newCategory = prompt("Edit category:", expense.category);
+
+            if (newName && newAmount && newCategory) {
+                expense.name = newName;
+                expense.amount = newAmount;
+                expense.category = newCategory;
+                localStorage.setItem('expenses', JSON.stringify(expenses));
+                showDiary();
+            }
+        }
+    }
+
+    function deleteExpense(id) {
+        const index = expenses.findIndex(exp => exp.id === id);
+        if (index !== -1) {
+            expenses.splice(index, 1);
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            showDiary();
+        }
+    }
+
+    // Show diary on page load
+    showDiary();
+</script>
+
+</body>
+</html>

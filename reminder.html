@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker - Reminders</title>
+    <style>
+        /* Basic styling for the interface */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 600px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .title {
+            font-size: 24px;
+            text-align: center;
+            color: #0072ff;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #0072ff;
+            color: white;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #005bb5;
+        }
+
+        .reminder-list {
+            margin-top: 20px;
+        }
+
+        .reminder-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid #0072ff;
+            transition: transform 0.3s;
+        }
+
+        .reminder-item.overdue {
+            border-color: #ff0000;
+        }
+
+        .reminder-item.completed {
+            background-color: #d4f7d4;
+            border-color: #4CAF50;
+        }
+
+        .reminder-item .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit, .delete, .complete {
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            transition: color 0.3s;
+        }
+
+        .edit:hover { color: #0072ff; }
+        .delete:hover { color: #ff0000; }
+        .complete:hover { color: #4CAF50; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="title">Set Reminder for Expenses</h1>
+
+    <div class="form-group">
+        <label for="name">Expense Name</label>
+        <input type="text" id="name" placeholder="Enter expense name">
+    </div>
+
+    <div class="form-group">
+        <label for="amount">Amount</label>
+        <input type="number" id="amount" placeholder="Enter amount">
+    </div>
+
+    <div class="form-group">
+        <label for="date">Due Date</label>
+        <input type="date" id="date">
+    </div>
+
+    <div class="form-group">
+        <label for="notes">Notes (Optional)</label>
+        <textarea id="notes" placeholder="Add any notes..."></textarea>
+    </div>
+
+    <button onclick="addReminder()">Add Reminder</button>
+
+    <div class="reminder-list" id="reminder-list">
+        <h2>Upcoming Reminders</h2>
+        <!-- Reminders will be listed here -->
+    </div>
+</div>
+
+<script>
+    // Initialize reminders from localStorage
+    let reminders = JSON.parse(localStorage.getItem('expenseReminders')) || [];
+
+    // Load and display reminders when page loads
+    window.onload = function() {
+        displayReminders();
+    };
+
+    function saveToLocalStorage() {
+        localStorage.setItem('expenseReminders', JSON.stringify(reminders));
+    }
+
+    function addReminder() {
+        const name = document.getElementById('name').value;
+        const amount = document.getElementById('amount').value;
+        const date = document.getElementById('date').value;
+        const notes = document.getElementById('notes').value;
+
+        if (!name || !amount || !date) {
+            alert("Please fill in all required fields.");
+            return;
+        }
+
+        const reminder = { name, amount, date, notes, completed: false };
+        reminders.push(reminder);
+        saveToLocalStorage(); // Save to localStorage
+        displayReminders();
+
+        document.getElementById('name').value = '';
+        document.getElementById('amount').value = '';
+        document.getElementById('date').value = '';
+        document.getElementById('notes').value = '';
+    }
+
+    function displayReminders() {
+        const reminderList = document.getElementById('reminder-list');
+        reminderList.innerHTML = "<h2>Upcoming Reminders</h2>";
+
+        reminders.forEach((reminder, index) => {
+            const isOverdue = new Date(reminder.date) < new Date() && !reminder.completed;
+            const reminderItem = document.createElement('div');
+            reminderItem.classList.add('reminder-item');
+            if (isOverdue) reminderItem.classList.add('overdue');
+            if (reminder.completed) reminderItem.classList.add('completed');
+
+            reminderItem.innerHTML = `
+                <div>
+                    <strong>${reminder.name}</strong><br>
+                    Amount: ₹${reminder.amount} | Due: ${reminder.date}<br>
+                    Notes: ${reminder.notes || "None"}
+                </div>
+                <div class="actions">
+                    <span class="edit" onclick="editReminder(${index})">Edit</span>
+                    <span class="delete" onclick="deleteReminder(${index})">Delete</span>
+                    <span class="complete" onclick="markComplete(${index})">Complete</span>
+                </div>
+            `;
+            reminderList.appendChild(reminderItem);
+        });
+    }
+
+    function editReminder(index) {
+        const reminder = reminders[index];
+        document.getElementById('name').value = reminder.name;
+        document.getElementById('amount').value = reminder.amount;
+        document.getElementById('date').value = reminder.date;
+        document.getElementById('notes').value = reminder.notes;
+
+        deleteReminder(index);
+    }
+
+    function deleteReminder(index) {
+        reminders.splice(index, 1);
+        saveToLocalStorage(); // Save to localStorage
+        displayReminders();
+    }
+
+    function markComplete(index) {
+        reminders[index].completed = true;
+        saveToLocalStorage(); // Save to localStorage
+        displayReminders();
+    }
+    if (Notification.permission === "granted") {
+    new Notification("Reminder: Rent due tomorrow!");
+}
+
+</script>
+
+</body>
+</html>
